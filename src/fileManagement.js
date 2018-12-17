@@ -1,7 +1,8 @@
-var Promise = require('promise')
-var dav = require('davclient.js')
-var helpers
-var davClient
+const Promise = require('promise')
+const dav = require('davclient.js')
+let helpers
+let davClient
+const uuidv4 = require('uuid/v4')
 
 /**
  * @class Files
@@ -66,7 +67,8 @@ Files.prototype.list = function (path, depth, properties) {
 
   return new Promise((resolve, reject) => {
     davClient.propFind(helpers._buildFullWebDAVPath(path), properties, depth, {
-      'Authorization': helpers.getAuthorization()
+      'Authorization': helpers.getAuthorization(),
+      'X-Request-ID': uuidv4()
     }).then(result => {
       if (result.status !== 207) {
         resolve(null)
@@ -129,7 +131,8 @@ Files.prototype.putFileContents = function (path, content) {
     }
 
     davClient.request('PUT', helpers._buildFullWebDAVPath(path), {
-      'Authorization': helpers.getAuthorization()
+      'Authorization': helpers.getAuthorization(),
+      'X-Request-ID': uuidv4()
     }, content).then(result => {
       if ([200, 201, 204, 207].indexOf(result.status) > -1) {
         resolve(true)
@@ -160,7 +163,8 @@ Files.prototype.mkdir = function (path) {
     }
 
     davClient.request('MKCOL', helpers._buildFullWebDAVPath(path), {
-      'Authorization': helpers.getAuthorization()
+      'Authorization': helpers.getAuthorization(),
+      'X-Request-ID': uuidv4()
     }).then(result => {
       if ([200, 201, 204, 207].indexOf(result.status) > -1) {
         resolve(true)
@@ -197,7 +201,8 @@ Files.prototype.delete = function (path) {
     }
 
     davClient.request('DELETE', helpers._buildFullWebDAVPath(path), {
-      'Authorization': helpers.getAuthorization()
+      'Authorization': helpers.getAuthorization(),
+      'X-Request-ID': uuidv4()
     }).then(result => {
       if ([200, 201, 204, 207].indexOf(result.status) > -1) {
         resolve(true)
@@ -270,6 +275,7 @@ Files.prototype.move = function (source, target) {
 
     davClient.request('MOVE', helpers._buildFullWebDAVPath(source), {
       'Authorization': helpers.getAuthorization(),
+      'X-Request-ID': uuidv4(),
       'Destination': helpers._buildFullWebDAVPath(target)
     }).then(result => {
       if ([200, 201, 204, 207].indexOf(result.status) > -1) {
@@ -299,6 +305,7 @@ Files.prototype.copy = function (source, target) {
 
     davClient.request('COPY', helpers._buildFullWebDAVPath(source), {
       'Authorization': helpers.getAuthorization(),
+      'X-Request-ID': uuidv4(),
       'Destination': helpers._buildFullWebDAVPath(target)
     }).then(result => {
       if ([200, 201, 204, 207].indexOf(result.status) > -1) {
@@ -330,7 +337,8 @@ Files.prototype.favorite = function (path, value) {
     davClient.propPatch(helpers._buildFullWebDAVPath(path), {
       '{http://owncloud.org/ns}favorite': value ? 'true' : 'false'
     }, {
-      'Authorization': helpers.getAuthorization()
+      'Authorization': helpers.getAuthorization(),
+      'X-Request-ID': uuidv4()
     }).then(result => {
       if ([200, 201, 204, 207].indexOf(result.status) > -1) {
         resolve(true)

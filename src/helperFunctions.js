@@ -1,9 +1,10 @@
-var Promise = require('promise')
-var request = require('browser-request')
-var parser = require('./xmlParser.js')
-var parser2 = require('xml-js')
-var utf8 = require('utf8')
-var FileInfo = require('./fileInfo.js')
+const Promise = require('promise')
+const request = require('browser-request')
+const parser = require('./xmlParser.js')
+const parser2 = require('xml-js')
+const utf8 = require('utf8')
+const FileInfo = require('./fileInfo.js')
+const uuidv4 = require('uuid/v4')
 
 function helpers () {
   this.OCS_BASEPATH = 'ocs/v1.php/'
@@ -156,7 +157,8 @@ helpers.prototype._makeOCSrequest = function (method, service, action, data) {
   // Set the headers
   var headers = {
     authorization: this._authHeader,
-    'OCS-APIREQUEST': true
+    'OCS-APIREQUEST': true,
+    'X-Request-ID': uuidv4()
   }
 
   var slash = ''
